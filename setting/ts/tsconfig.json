@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true, // import * as React from 'react'; 를  import React from 'react'; 이렇게 가져올 수 있음
+    "sourceMap": true, // true로 설정 시 에러난 위치 찾아 갈 때 편함
+    "lib": ["ES2020", "DOM"],
+    "jsx": "react",
+    "module": "esnext",
+    "moduleResolution": "Node",
+    "target": "es5",
+    "strict": true, // typescript에서 strict하게 가지 않으면 typescript를 사용하는 의미가 없음. any가 남발 될 가능성이 농후해서
+    "resolveJsonModule": true, // import json file을 허락하겠다
+    "baseUrl": ".",
+    "paths": { // path를 절대 경로와 비슷하게 설정해놈
+      "@hooks/*": ["hooks/*"],
+      "@components/*": ["components/*"],
+      "@layouts/*": ["layouts/*"],
+      "@pages/*": ["pages/*"],
+      "@utils/*": ["utils/*"],
+      "@typings/*": ["typings/*"]
+    }
+  }
+}
