@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@emotion/babel-plugin": "^11.9.2",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@loadable/component": "^5.15.2",
