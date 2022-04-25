@@ -3,24 +3,25 @@ import { Form, Error, Label, Input, LinkContainer, Button, Header } from "./styl
 // Styled Component는 최소한만 사용하는걸 추천함. 변수명을 많이 지어야하니까
 // Styled Component의 불편함을 개선한 것이 emotion. 근데 사용량은 styled component가 더 많음
 import { Link } from 'react-router-dom';
+import useInput from '../../../../multicampus/ch2/hooks/useInput';
 
 const SingUp = () => {
-  const [email, setEmail] = useState("")
-  const [nickname, setNickName] = useState("")
+  const [email, onChangeEmail, setEmail] = useInput("")
+  const [nickname, onChangeNickname, setNickName] = useInput("")
   const [password, setPassword] = useState("")
   const [passwordCheck, setPasswordCheck] = useState("")
   const [mismatchError, setMismatchError] = useState(false)
 
-  // useCallback을 사용하지 않으면 이 함수들이 매번 재생성된다. 
-  // 리렌더링이 많이 일어나니까 디버깅이 어려워지므로 useCallback 사용
-  // 리렌더링은 화면을 다시그리는건 아니다. 
-  const onChangeEmail = useCallback((e: { target: { value: React.SetStateAction<string>; }; }) => {
-    setEmail(e.target.value)
-  }, [])
+  // // useCallback을 사용하지 않으면 이 함수들이 매번 재생성된다. 
+  // // 리렌더링이 많이 일어나니까 디버깅이 어려워지므로 useCallback 사용
+  // // 리렌더링은 화면을 다시그리는건 아니다. 
+  // const onChangeEmail = useCallback((e: { target: { value: React.SetStateAction<string>; }; }) => {
+  //   setEmail(e.target.value)
+  // }, [])
 
-  const onChangeNickname = useCallback((e: { target: { value: React.SetStateAction<string>; }; }) => {
-    setNickName(e.target.value)
-  }, [])
+  // const onChangeNickname = useCallback((e: { target: { value: React.SetStateAction<string>; }; }) => {
+  //   setNickName(e.target.value)
+  // }, [])
 
   const onChangePassword = useCallback((e: { target: { value: React.SetStateAction<string>; }; }) => {
     setPassword(e.target.value)
