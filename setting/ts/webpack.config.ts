@@ -44,7 +44,13 @@ const config: webpack.Configuration = {
           ],
           env: {
             development: {
-              plugins: ['@emotion/babel-plugin', require.resolve('react-refresh/babel')],
+              // 바벨 플러그인을 적용하면 압축, 안쓰는 코드 제거, 소스맵 제공이 된다.
+              // 스타일드 컴포넌트 혹은 이모션이, 클래스 네임으로 바뀌는데 클래스네임이 뭐가 될지 미리 알 수 있게 함 (?) 문서 참조
+              // TODO: check!! https://www.npmjs.com/package/@emotion/babel-plugin
+              plugins: [['@emotion', {sourceMaps: true}], require.resolve('react-refresh/babel')],
+            },
+            production: {
+              plugins: ['@emotion']
             }
           }
         },

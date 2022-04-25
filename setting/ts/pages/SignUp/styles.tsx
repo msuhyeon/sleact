@@ -16,6 +16,14 @@ export const Form = styled.form`
   width: 400px;
   max-width: 400px;
 `;
+// export const Form = styled.form`
+//   margin: 0 auto;
+//   width: 400px;
+//   max-width: 400px;
+//   & ${Label} {
+//       ...
+//   } Form의 자식 요소에 Label이 있으면 이 안에 기술된 css를 따른다
+// `;
 
 export const Label = styled.label`
   margin-bottom: 16px;
