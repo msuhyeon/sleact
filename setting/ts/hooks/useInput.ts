@@ -12,7 +12,7 @@ type ReturnTypes<T = any> = [T, (e: any) => void, Dispatch<SetStateAction<T>>]
 // any로 타입을 지정했을 때 안좋은점은 입력을 string으로 받아도 리턴이 string으로 되지 않음.
 const useInput = <T = any>(initialData: T): ReturnTypes<T> => {
    const [value, setValue] = useState(initialData) 
-   const handler = useCallback((e) => {
+   const handler = useCallback((e: any) => {
        setValue(e.target.value)
    }, [])
 

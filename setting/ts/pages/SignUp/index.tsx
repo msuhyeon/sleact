@@ -1,14 +1,18 @@
 import React, {useState, useCallback} from "react";
 import { Form, Error, Label, Input, LinkContainer, Button, Header } from "./styles"; // css in js
+import axios from "axios"
 // Styled Component는 최소한만 사용하는걸 추천함. 변수명을 많이 지어야하니까
 // Styled Component의 불편함을 개선한 것이 emotion. 근데 사용량은 styled component가 더 많음
 import { Link } from 'react-router-dom';
-import useInput from '../../../../multicampus/ch2/hooks/useInput';
+import useInput from "@hooks/useInput";
 
 const SingUp = () => {
-  const [email, onChangeEmail, setEmail] = useInput("")
-  const [nickname, onChangeNickname, setNickName] = useInput("")
+  const [email, onChangeEmail] = useInput("")
+  const [nickname, onChangeNickname] = useInput("")
   const [password, setPassword] = useState("")
+  // useInput을 사용하고 싶을 경우, 구조분해 할당에 의해 이런 식으로 표현이 가능하다.
+  // const [password, , setPassword] = useInput("")
+  // useInput을 써서 통일성있게 만들면서 커스터마이징을 해야된다 하면 필요한 변수 자리를 빈자리로 만들면 된다.
   const [passwordCheck, setPasswordCheck] = useState("")
   const [mismatchError, setMismatchError] = useState(false)
 
@@ -32,15 +36,25 @@ const SingUp = () => {
   const onChangePasswordCheck = useCallback((e: { target: { value: React.SetStateAction<string>; }; }) => {
     setPasswordCheck(e.target.value)
     setMismatchError(e.target.value !== password)
-
-  }, [])
+  }, [password])
 
   const onSubmit = useCallback((e: { preventDefault: () => void; }) => {
     // form에서 e.preventDefault()를 하지 않으면 페이지가 새로고침 되어버림 새로고침되면 기존 spa의 상태들이 모두 소실되므로 항상 추가
     e.preventDefault()
     console.log(email, nickname, password, passwordCheck)
+    console.log("역이", mismatchError)
     if (!mismatchError) {
+      console.log("여기안와?!")
       console.log("서버로 회원가입")
+      axios.post("http://localhost:3095/api/users", {
+        email, nickname, password
+      }).then((res) => {
+        console.log(res)
+      }).catch((err) => {
+        console.error(err.response)
+      }).finally(() => {
+
+      })
     }
   }, [email, nickname, password, passwordCheck])
 
