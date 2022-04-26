@@ -1,5 +1,5 @@
 import React, {useState, useCallback} from "react";
-import { Form, Error, Label, Input, LinkContainer, Button, Header } from "./styles"; // css in js
+import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } from "./styles"; // css in js
 import axios from "axios"
 // Styled Component는 최소한만 사용하는걸 추천함. 변수명을 많이 지어야하니까
 // Styled Component의 불편함을 개선한 것이 emotion. 근데 사용량은 styled component가 더 많음
@@ -15,6 +15,8 @@ const SingUp = () => {
   // useInput을 써서 통일성있게 만들면서 커스터마이징을 해야된다 하면 필요한 변수 자리를 빈자리로 만들면 된다.
   const [passwordCheck, setPasswordCheck] = useState("")
   const [mismatchError, setMismatchError] = useState(false)
+  const [signUpError, setSignUpError] = useState("")
+  const [signUpSuccess, setSignUpSuccess] = useState(true)
 
   // // useCallback을 사용하지 않으면 이 함수들이 매번 재생성된다. 
   // // 리렌더링이 많이 일어나니까 디버깅이 어려워지므로 useCallback 사용
@@ -42,16 +44,23 @@ const SingUp = () => {
     // form에서 e.preventDefault()를 하지 않으면 페이지가 새로고침 되어버림 새로고침되면 기존 spa의 상태들이 모두 소실되므로 항상 추가
     e.preventDefault()
     console.log(email, nickname, password, passwordCheck)
-    console.log("역이", mismatchError)
     if (!mismatchError) {
-      console.log("여기안와?!")
-      console.log("서버로 회원가입")
-      axios.post("http://localhost:3095/api/users", {
+      // then, catch, finally 에서 setState() 하는 것들은 비동기 요청하기 전에 초기화 하는게 좋음
+      // 연달아 요청하는 경우 첫번째 요청때 남아있던 결과가 두번째 요청때 남아있을 수 있음! 그 문제를 방지
+      setSignUpError("") 
+      setSignUpSuccess(false)
+      
+      // TODO: 차이점 숙지!
+      // axios.post("http://localhost:3095/api/users" : 3090이 3095에게 보내는것
+      // axios.post("/api/users" : 3095가 3095에게 보내는 것 (webpack.config.ts에서 proxy 3095로 설정했을 경우)
+      axios.post("/api/users", {
         email, nickname, password
       }).then((res) => {
         console.log(res)
+        setSignUpSuccess(true)
       }).catch((err) => {
         console.error(err.response)
+        setSignUpError(err.response.data)
       }).finally(() => {
 
       })
@@ -93,8 +102,8 @@ const SingUp = () => {
           </div>
           {mismatchError && <Error>비밀번호가 일치하지 않습니다.</Error>}
           {!nickname && <Error>닉네임을 입력해주세요.</Error>}
-          {/*{signUpError && <Error>{signUpError}</Error>}
-          {signUpSuccess && <Success>회원가입되었습니다! 로그인해주세요.</Success>} */}
+          {signUpError && <Error>{signUpError}</Error>}
+          {signUpSuccess && <Success>회원가입되었습니다! 로그인해주세요.</Success>}
         </Label>
         <Button type="submit">회원가입</Button>
       </Form>
