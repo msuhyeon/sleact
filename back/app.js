@@ -33,22 +33,25 @@ if (prod) {
   app.use(hpp());
 } else {
   app.use(morgan("dev"));
-  app.use(
-    cors({
-      origin: true,
-      credentials: true,
-    })
-  );
+  // cors 설정 front, back port가 다를 경우 api 요청을 하기 위해 설정
+  // CORS 관련 에러
+  // Access to XMLHttpRequest at 'http://localhost:3095/api/users' from origin 'http://localhost:3090' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+  // app.use(
+  //   cors({
+  //     origin: true,
+  //     credentials: true,
+  //   })
+  // );
 }
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(cookieParser("sleactcookie"));
 const sessionOption = {
   resave: false,
   saveUninitialized: false,
-  secret: process.env.COOKIE_SECRET,
+  secret: "sleactcookie",
   cookie: {
     httpOnly: true,
   },
