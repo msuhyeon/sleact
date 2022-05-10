@@ -3,6 +3,8 @@ import useSWR from "swr"
 import fetcher from '@utils/fetcher';
 import axios from "axios";
 import { Redirect } from "react-router";
+import { Header, ProfileImg, RightMenu, WorkspaceWrapper } from '@layouts/Workspace/styles';
+import gravatar from "gravatar"
 
 // children을 쓰는 컴포넌트는 FC타입,  안쓰는 컴포넌트는 VFC가 타입
 // FC라는 타입안에 children이 알아서 들어있다,
@@ -37,9 +39,25 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
         return <Redirect to="/login" />
     }
 
+    // npm 모듈 설치 시 @types 까지 설치해야되는게 뭔지 모른다면?
+    // npmjs.com 사이트로 가서 gravatar 검색 -> 검색 결과 클릭 시 이름 옆에 "DT"이면 깔아야하고, "TS"이면 안깔아도됨.
+    // "DT" 조차 없으면 내가 직접 타입을 만들어야함. 
+    // 간혹가다 npm 모듈 만든사람이랑 TS 만든사람이 다른 경우 타입이 안맞아서 에러가 날 수 있는데
+    // 그 경우는 또 내가 직접 타입을 만들어야함.
+
     return (
         <div>
+            <Header>
+                <RightMenu>
+                    <span>
+                        <ProfileImg src={gravatar.url(data.nickname, {s: "28px", d: "retro"})} alt={data.nickname}/>
+                    </span>
+                </RightMenu>
+            </Header>
             <button onClick={onLogout}>로그아웃</button>
+            <WorkspaceWrapper>
+                <Workspace>test</Workspace>
+            </WorkspaceWrapper>
             {children}
         </div>
     )
