@@ -35,16 +35,22 @@ const LogIn = () => {
   // revalidateOnFocus
   // refreshWhenHidden
 
-
-  // fethcer라는 함수는 앞의 주소를 어떻게 처리할지를 적어주는 것, fetcher가 리턴하는 데이터가 data
-  const { data: userData, error, mutate } = useSWR('/api/users', fetcher);
+  // 1. 로그인 화면에서 젤 먼저 이게 실행된다.
+  // 6. revalidate가 실행되면 data가 false였다가 유저 정보가 들어가면서 로그인된 상태로 바뀜
+  // fetcher라는 함수는 앞의 주소를 어떻게 처리할지를 적어주는 것, fetcher가 리턴하는 데이터가 data
+  // 이때 data나 error 값이 바뀌면 컴포넌트가 리렌더링된다
+  const { data, error, mutate } = useSWR('/api/users', fetcher, {
+    dedupingInterval: 1000000,
+  });
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
+  // 3. 패스워드 입력 후 로그인을 누르면 실행됨
   const onSubmit = useCallback(
     (e: { preventDefault: () => void; }) => {
       e.preventDefault();
       setLogInError(false);
+      // 4. 요청 보내고
       axios
         .post(
           '/api/users/login',
@@ -56,7 +62,9 @@ const LogIn = () => {
           },
         )
         .then(() => {
-          mutate();
+          // 5. 실행된다
+          mutate(); //mutate 할 때 마다 호출한다.
+
         })
         .catch((error) => {
           setLogInError(error.response?.data?.code === 401);
@@ -65,10 +73,18 @@ const LogIn = () => {
     [email, password, mutate],
   );
 
-  console.log(error, userData);
-  if (!error && userData) {
-    console.log('로그인됨', userData);
-    return <Redirect to="/workspace/sleact/channel/일반" />;
+
+  if (typeof data === "undefined") {
+    return <div>로딩중...</div>
+  }
+
+  // console.log(error, userData);
+  // 2. 로그인 안한 상태에서 data가 false니까 이게 실행안됨
+  // 7. 리렌더링 되서 다시 검사하면 data가 true니까 실행된다
+  if (data) {
+    console.log('로그인됨', data);
+    // <Redirect exact path="/" to="/login" />; 과 같다
+    return <Redirect to="/workspace/channel" />;
   }
 
   return (
