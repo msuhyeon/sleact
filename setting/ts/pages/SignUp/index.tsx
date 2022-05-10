@@ -3,10 +3,15 @@ import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } fro
 import axios from "axios"
 // Styled Component는 최소한만 사용하는걸 추천함. 변수명을 많이 지어야하니까
 // Styled Component의 불편함을 개선한 것이 emotion. 근데 사용량은 styled component가 더 많음
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import useInput from "@hooks/useInput";
+import useSWR from "swr";
+import fetcher from "@utils/fetcher";
 
 const SingUp = () => {
+  const { data, error, mutate } = useSWR('/api/users', fetcher, {
+    dedupingInterval: 1000000,
+  });
   const [email, onChangeEmail] = useInput("")
   const [nickname, onChangeNickname] = useInput("")
   const [password, setPassword] = useState("")
@@ -66,6 +71,18 @@ const SingUp = () => {
       })
     }
   }, [email, nickname, password, passwordCheck])
+
+  if (typeof data === "undefined") {
+    return <div>로딩중...</div>
+  }
+
+
+  // 리턴은 항상 Hooks 보다 아래에 위치해야함 
+  if (data) {
+    console.log('로그인됨', data);
+    // <Redirect exact path="/" to="/login" />; 과 같다
+    return <Redirect to="/workspace/channel" />
+  }
 
     return(
         <div id="container">
