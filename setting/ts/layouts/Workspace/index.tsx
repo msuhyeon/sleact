@@ -1,20 +1,23 @@
-import React, {FC, useCallback} from "react"
+import React, {FC, useCallback, useState} from "react"
 import useSWR from "swr"
 import fetcher from '@utils/fetcher';
 import axios from "axios";
 import { Redirect, Switch, Route } from "react-router";
-import { Channels, Chats, Header, MenuScroll, ProfileImg, RightMenu, WorkspaceName, WorkspaceWrapper } from '@layouts/Workspace/styles';
+import { Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceName, WorkspaceWrapper } from '@layouts/Workspace/styles';
 import gravatar from "gravatar"
 import loadable from "@loadable/component";
+import Menu from "@components/Menu";
 
 const Channel = loadable(() => import("@pages/Channel"));
 const DirectMessage = loadable(() => import("@pages/DirectMessage"));
 
-
 // children을 쓰는 컴포넌트는 FC타입,  안쓰는 컴포넌트는 VFC가 타입
 // FC라는 타입안에 children이 알아서 들어있다,
 const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
-    const { data, error, mutate } = useSWR('/api/users', fetcher);
+    const [showUserMenu, setShowUserMenu] = useState(false)
+    const { data, error, mutate } = useSWR('/api/users', fetcher, {
+        dedupingInterval: 2000, // 2초
+      });
 
     // SWR을 이용해서 로컬스토리지의 데이터를 가져 올 수도 있음. 항상 비동기 요청이랑만 관련있는게 아님. 전역 데이터 관리자! -> 리덕스를 대체!!
     // const { data } = useSWR('hello', () => {localStorage.setItem('data', key); return localStorage.getItem('data) })
@@ -23,7 +26,7 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
     // 주소에 쿼리 스트링이나 '/api/users#123' 이렇게 주소를 변형한다. 서버는 #을 무시하기 때문에 둘다 같은 주소로 보내는 요청으로 인식함 
 
     const onLogout = useCallback(() => {
-        axios.post("http://localhost:3095/api/users/logout", null, {
+        axios.post("/api/users/logout", null, {
             withCredentials: true,
         }).then(() => {
             // 서버에 요청 보내는 대신에 클라이언트에서 데이터를 조작할 수 있는 mutate라는 기능이 있음
@@ -38,6 +41,10 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
             // 내가 보낸 요청이 성공할 거라고 낙관적으로 보고, UI에 반영 후 점검 하는 것. => optimistic UI
             // 내가 보낸 요청이 실패할 거라고 낙관적으로 보고, 점검 한 후에 UI에 반영. => pessimistic UI
         });
+    }, [])
+
+    const onClickUserProfile = useCallback(() => {
+        setShowUserMenu((prev) => !prev)
     }, [])
 
     if (!data) {
@@ -59,7 +66,22 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
             <Header>
                 <RightMenu>
                     <span>
-                        <ProfileImg src={gravatar.url(data.nickname, {s: "28px", d: "retro"})} alt={data.nickname}/>
+                        <span onClick={onClickUserProfile}>
+                            <ProfileImg src={gravatar.url(data.nickname, {s: "28px", d: "retro"})} alt={data.nickname}/>
+                            {/* 단일 책임 원칙: 하나의 컴포넌트는 하나의 역할만 한다. => 이 규칙에 따라 컴포넌트를 분리하기도함. */}
+                            {showUserMenu && 
+                                <Menu style={{right: 0, top: 38}} show={showUserMenu} onCloseModal={onClickUserProfile}>
+                                    <ProfileModal>
+                                        <img src={gravatar.url(data.nickname, {s: "36px", d: "retro"})} alt={data.nickname} /> 
+                                        <div>
+                                            <span id="profile-name">{data.nickname}</span>
+                                            <span id="profile-active">Active</span>
+                                        </div>
+                                    </ProfileModal>
+                                    <LogOutButton>로그아웃</LogOutButton>
+                                </Menu>
+                            }
+                        </span>
                     </span>
                 </RightMenu>
             </Header>
