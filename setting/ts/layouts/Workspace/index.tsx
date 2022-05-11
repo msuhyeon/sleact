@@ -2,9 +2,14 @@ import React, {FC, useCallback} from "react"
 import useSWR from "swr"
 import fetcher from '@utils/fetcher';
 import axios from "axios";
-import { Redirect } from "react-router";
-import { Header, ProfileImg, RightMenu, WorkspaceWrapper } from '@layouts/Workspace/styles';
+import { Redirect, Switch, Route } from "react-router";
+import { Channels, Chats, Header, MenuScroll, ProfileImg, RightMenu, WorkspaceName, WorkspaceWrapper } from '@layouts/Workspace/styles';
 import gravatar from "gravatar"
+import loadable from "@loadable/component";
+
+const Channel = loadable(() => import("@pages/Channel"));
+const DirectMessage = loadable(() => import("@pages/DirectMessage"));
+
 
 // children을 쓰는 컴포넌트는 FC타입,  안쓰는 컴포넌트는 VFC가 타입
 // FC라는 타입안에 children이 알아서 들어있다,
@@ -45,6 +50,10 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
     // 간혹가다 npm 모듈 만든사람이랑 TS 만든사람이 다른 경우 타입이 안맞아서 에러가 날 수 있는데
     // 그 경우는 또 내가 직접 타입을 만들어야함.
 
+
+    // 모든 컴포넌트를 styledComponent로 만들면 구조 파악에 방해됨
+    // 큼직큼직한 구역 단위로만 만들고, css로 sass 스타일로 하는게 좋다
+
     return (
         <div>
             <Header>
@@ -56,7 +65,19 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
             </Header>
             <button onClick={onLogout}>로그아웃</button>
             <WorkspaceWrapper>
-                <Workspace>test</Workspace>
+                <Workspace>test</Workspace> 
+                <Channels>
+                    <WorkspaceName>Sleact</WorkspaceName>
+                    <MenuScroll>
+                        MenuScroll
+                    </MenuScroll>
+                </Channels>
+                <Chats>
+                    <Switch>
+                        <Route path="/workspace/channel" component={Channel}/>
+                        <Route path="/workspace/dm" component={DirectMessage}/>
+                    </Switch>
+                </Chats>
             </WorkspaceWrapper>
             {children}
         </div>

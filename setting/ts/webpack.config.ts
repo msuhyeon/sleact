@@ -80,7 +80,8 @@ const config: webpack.Configuration = {
     historyApiFallback: true, // react router 할 때 필요한 설정. false로 했을 경우 새로고침할 때 /login 이 안뜬다. 이것의 역할: 주소를 사기쳐주는(?).SPA는 페이지가 하나이기 때문에 index.html 하나밖에 없는데 가짜로 /login을 만들어 주는것이다. 얘가 가짜 주소를 입력해준다. 원래는 새로고침할 때 localhost:3090/login은 서버로 간다. /signup을 쳐도 서버는 무조건 localhost:3090으로 간다(index 페이지로 간다는 뜻) true로 해두면 서버에는 없는 주소(/signup, /login)를 있는것 마냥 해줘서 /login, /signup으로 가는 것 이다.  
     port: 3090,
     publicPath: '/dist/',
-    proxy: { // proxy에서 /api로 보내는 요청은 주소를 3095로 보내는 것 처럼 취급하겠다 뜻
+    // 이 proxy 눈속임?은 백, 프론트 모두 로컬호스트일 때 먹히는 방법
+    proxy: { // proxy에서 /api로 보내는 요청은 주소를 3095로 보내는 것 처럼 취급하겠다 뜻(3090이 아닌 3095인 것 처럼 속임) 그래서 개발자 도구의 network탭에서 확인해보면 options 요청이 안감!
       '/api/': {
         target: 'http://localhost:3095',
         changeOrigin: true,

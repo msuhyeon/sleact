@@ -15,7 +15,13 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 // code splitting을 언제할지, 언제 불러올 지 고민하지 않아도 된다.
 const LogIn = loadable(() => import("@pages/LogIn"));
 const SignUp = loadable(() => import("@pages/SignUp"));
-const Channel = loadable(() => import("@pages/Channel"));
+const Workspace = loadable(() => import("@layouts/Workspace"));
+// App.tsx에서 사용하는 메인 라우터에서는 Workspace만 등록을 해놓고
+// Workspace안에서 또 Switch, Route 사용 (Switch, Route안에서 또 Switch, Route 사용이 가능함!)
+// 
+
+
+// 코드 스플릿팅은 이 파일 뿐만 아니라 모든 파일에서 가능하다
 
 const App = () => {
   return ( 
@@ -23,7 +29,7 @@ const App = () => {
         <Redirect exact path="/" to="/login" />
         <Route path="/login" component={LogIn}/>
         <Route path="/signup" component={SignUp}/>
-        <Route path="/workspace/channel" component={Channel}/>
+        <Route path="/workspace" component={Workspace}/>
       </Switch>
   ); 
     
