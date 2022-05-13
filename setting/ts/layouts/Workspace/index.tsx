@@ -2,20 +2,36 @@ import React, {FC, useCallback, useState} from "react"
 import useSWR from "swr"
 import fetcher from '@utils/fetcher';
 import axios from "axios";
-import { Redirect, Switch, Route } from "react-router";
-import { Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceName, WorkspaceWrapper } from '@layouts/Workspace/styles';
+import { Redirect } from "react-router";
+// import { Redirect as abc } from "react-router"; // 이렇게 하면 Redirect를 abc로 개명해서 사용할 수 있다.
+import { Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceButton, WorkspaceName, WorkspaceWrapper, AddButton } from '@layouts/Workspace/styles';
 import gravatar from "gravatar"
 import loadable from "@loadable/component";
 import Menu from "@components/Menu";
+import { Link, Route, Switch } from "react-router-dom";
 
 const Channel = loadable(() => import("@pages/Channel"));
 const DirectMessage = loadable(() => import("@pages/DirectMessage"));
+import { IUser } from '@typings/db';
+import { Modal } from '@components/Modal';
+import { Button, Input, Label } from '@pages/SignUp/styles';
+import useInput from "@hooks/useInput";
+import { toast } from "react-toastify"
 
 // children을 쓰는 컴포넌트는 FC타입,  안쓰는 컴포넌트는 VFC가 타입
 // FC라는 타입안에 children이 알아서 들어있다,
 const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
-    const [showUserMenu, setShowUserMenu] = useState(false)
-    const { data, error, mutate } = useSWR('/api/users', fetcher, {
+    const [showUserMenu, setShowUserMenu] = useState(false);
+    const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] = useState(false);
+    const [showInviteWorkspaceModal, setShowInviteWorkspaceModal] = useState(false);
+    const [showInviteChannelModal, setShowInviteChannelModal] = useState(false);
+    const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
+    const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
+    const [newWorkspace, onChangeNewWorkspace, setNewWorkpsace] = useInput('');
+    const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
+
+    // data를 userData로 개명시킴
+    const { data: userData, error, mutate } = useSWR<IUser | false>('/api/users', fetcher, {
         dedupingInterval: 2000, // 2초
       });
 
@@ -43,11 +59,61 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
         });
     }, [])
 
-    const onClickUserProfile = useCallback(() => {
+    const onClickUserProfile = useCallback((e) => {
+        e.stopPropagation()
         setShowUserMenu((prev) => !prev)
     }, [])
 
-    if (!data) {
+    const onClickCreateWorkSpace = useCallback(() => {
+        setShowCreateWorkspaceModal(true)
+    }, [])
+
+    const onCreateWorkspace = useCallback(
+        (e) => {
+            // form을 submit 할 땐 항상 새로고침이 되지 않도록 preventDefault 추가
+            e.preventDefault();
+            
+            // 공백 여부, 필수 값 체크
+            if (!newWorkspace || !newWorkspace.trim()) return;
+            if (!newUrl || !newUrl.trim()) return;
+
+
+            axios
+                .post(
+                '/api/workspaces',
+                {
+                    workspace: newWorkspace,
+                    url: newUrl,
+                },
+                {
+                    // 이게 있어야 내가 로그인 한 상태라는 것을 서버가 쿠키를 전달해서 알 수 있다.
+                    withCredentials: true, 
+                },
+                )
+                .then(() => {
+                    // 제출 하고 input 값을 비워주지 않으면, 다음 번에 클릭했을 때 이전 입력 값이 남아있 수 있으니 비우기
+                    mutate();
+                    setShowCreateWorkspaceModal(false);
+                    setNewWorkpsace('');
+                    setNewUrl('');
+                })
+                .catch((error) => {
+                    console.dir(error);
+                    toast.error(error.response?.data, { position: 'bottom-center' });
+                });
+            },
+        [newWorkspace, newUrl],
+      );
+
+    const onCloseModal = useCallback(() => {
+        setShowCreateWorkspaceModal(false);
+        setShowCreateChannelModal(false);
+        setShowInviteWorkspaceModal(false);
+        setShowInviteChannelModal(false);
+      }, []);
+    
+
+    if (!userData) {
         return <Redirect to="/login" />
     }
 
@@ -56,7 +122,6 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
     // "DT" 조차 없으면 내가 직접 타입을 만들어야함. 
     // 간혹가다 npm 모듈 만든사람이랑 TS 만든사람이 다른 경우 타입이 안맞아서 에러가 날 수 있는데
     // 그 경우는 또 내가 직접 타입을 만들어야함.
-
 
     // 모든 컴포넌트를 styledComponent로 만들면 구조 파악에 방해됨
     // 큼직큼직한 구역 단위로만 만들고, css로 sass 스타일로 하는게 좋다
@@ -67,14 +132,14 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
                 <RightMenu>
                     <span>
                         <span onClick={onClickUserProfile}>
-                            <ProfileImg src={gravatar.url(data.nickname, {s: "28px", d: "retro"})} alt={data.nickname}/>
+                            <ProfileImg src={gravatar.url(userData.nickname, {s: "28px", d: "retro"})} alt={userData.nickname}/>
                             {/* 단일 책임 원칙: 하나의 컴포넌트는 하나의 역할만 한다. => 이 규칙에 따라 컴포넌트를 분리하기도함. */}
                             {showUserMenu && 
                                 <Menu style={{right: 0, top: 38}} show={showUserMenu} onCloseModal={onClickUserProfile}>
                                     <ProfileModal>
-                                        <img src={gravatar.url(data.nickname, {s: "36px", d: "retro"})} alt={data.nickname} /> 
+                                        <img src={gravatar.url(userData.nickname, {s: "36px", d: "retro"})} alt={userData.nickname} /> 
                                         <div>
-                                            <span id="profile-name">{data.nickname}</span>
+                                            <span id="profile-name">{userData.nickname}</span>
                                             <span id="profile-active">Active</span>
                                         </div>
                                     </ProfileModal>
@@ -87,7 +152,16 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
             </Header>
             <button onClick={onLogout}>로그아웃</button>
             <WorkspaceWrapper>
-                <Workspace>test</Workspace> 
+                <Workspace>
+                    {userData?.Workspaces.map((ws) => {
+                        return (
+                            <Link key={ws.id} to={`/workspace/${123}/channel/일반`}>
+                                <WorkspaceButton>{ws.name.slice(0,1).toUpperCase()}</WorkspaceButton>
+                            </Link>
+                        )
+                    })}
+                    <AddButton onClick={onClickCreateWorkSpace}>+</AddButton>
+                </Workspace> 
                 <Channels>
                     <WorkspaceName>Sleact</WorkspaceName>
                     <MenuScroll>
@@ -101,7 +175,19 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
                     </Switch>
                 </Chats>
             </WorkspaceWrapper>
-            {children}
+            <Modal show={showCreateWorkspaceModal} onCloseModal={onCloseModal}>
+                <form onSubmit={onCreateWorkspace}>
+                <Label id="workspace-label">
+                    <span>워크스페이스 이름</span>
+                    <Input id="workspace" value={newWorkspace} onChange={onChangeNewWorkspace} />
+                </Label>
+                <Label id="workspace-url-label">
+                    <span>워크스페이스 url</span>
+                    <Input id="workspace" value={newUrl} onChange={onChangeNewUrl} />
+                </Label>
+                <Button type="submit">생성하기</Button>
+                </form>
+            </Modal>
         </div>
     )
 }

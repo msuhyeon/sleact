@@ -4,7 +4,7 @@ import { CloseModalButton, CreateMenu } from "./styles"
 // react의 PropTypes 정의 와 동일함
 interface Props {
     show: boolean;
-    onCloseModal: () => void;
+    onCloseModal: (e: any) => void;
     style: CSSProperties;
     closeButton: boolean;
 }
