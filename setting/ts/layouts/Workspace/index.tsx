@@ -2,7 +2,7 @@ import React, {FC, useCallback, useState, VFC} from "react"
 import useSWR from "swr"
 import fetcher from '@utils/fetcher';
 import axios from "axios";
-import { Redirect } from "react-router";
+import { Redirect, useParams } from "react-router";
 // import { Redirect as abc } from "react-router"; // 이렇게 하면 Redirect를 abc로 개명해서 사용할 수 있다.
 import { Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceButton, WorkspaceName, WorkspaceWrapper, AddButton, WorkspaceModal } from '@layouts/Workspace/styles';
 import gravatar from "gravatar"
@@ -12,7 +12,7 @@ import { Link, Route, Switch } from "react-router-dom";
 
 const Channel = loadable(() => import("@pages/Channel"));
 const DirectMessage = loadable(() => import("@pages/DirectMessage"));
-import { IUser } from '@typings/db';
+import { IUser, IChannel } from '@typings/db';
 import { Modal } from '@components/Modal';
 import { Button, Input, Label } from '@pages/SignUp/styles';
 import useInput from "@hooks/useInput";
@@ -30,10 +30,15 @@ const Workspace: VFC = () => {
     const [newWorkspace, onChangeNewWorkspace, setNewWorkpsace] = useInput('');
     const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
 
+    const { workspace } = useParams<{ workspace: string }>();
+
     // data를 userData로 개명시킴
     const { data: userData, error, mutate } = useSWR<IUser | false>('/api/users', fetcher, {
         dedupingInterval: 2000, // 2초
       });
+
+    //채널 데이터를 서버로 부터 받아옴
+    const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher)
 
     // SWR을 이용해서 로컬스토리지의 데이터를 가져 올 수도 있음. 항상 비동기 요청이랑만 관련있는게 아님. 전역 데이터 관리자! -> 리덕스를 대체!!
     // const { data } = useSWR('hello', () => {localStorage.setItem('data', key); return localStorage.getItem('data) })
@@ -105,12 +110,13 @@ const Workspace: VFC = () => {
         [newWorkspace, newUrl],
       );
 
+    // 화면에 떠 있는 모든 모달 닫음
     const onCloseModal = useCallback(() => {
         setShowCreateWorkspaceModal(false);
         setShowCreateChannelModal(false);
         setShowInviteWorkspaceModal(false);
         setShowInviteChannelModal(false);
-      }, []);
+    }, []);
     
     const toggleWorkspaceModal = () => {
         setShowWorkspaceModal((prev) => !prev)   
@@ -118,11 +124,11 @@ const Workspace: VFC = () => {
 
     const onClickAddChannel = useCallback(() => {
         setShowCreateChannelModal(true);
-      }, []);
+    }, []);
     
-      const onClickInviteWorkspace = useCallback(() => {
+    const onClickInviteWorkspace = useCallback(() => {
         setShowInviteWorkspaceModal(true);
-      }, []);
+    }, []);
 
     if (!userData) {
         return <Redirect to="/login" />
@@ -187,8 +193,8 @@ const Workspace: VFC = () => {
                 </Channels>
                 <Chats>
                     <Switch>
-                        <Route path="/workspace/channel" component={Channel}/>
-                        <Route path="/workspace/dm" component={DirectMessage}/>
+                        <Route path="/workspace/:workspace/channel/:channel" component={Channel}/>
+                        <Route path="/workspace/:workspace/dm/:id" component={DirectMessage}/>
                     </Switch>
                 </Chats>
             </WorkspaceWrapper>
@@ -205,6 +211,21 @@ const Workspace: VFC = () => {
                 <Button type="submit">생성하기</Button>
                 </form>
             </Modal>
+            <CreateChannelModal
+                show={showCreateChannelModal}
+                onCloseModal={onCloseModal}
+                setShowCreateChannelModal={setShowCreateChannelModal}
+            />
+            <InviteWorkspaceModal
+                show={showInviteWorkspaceModal}
+                onCloseModal={onCloseModal}
+                setShowInviteWorkspaceModal={setShowInviteWorkspaceModal}
+            />
+            <InviteChannelModal
+                show={showInviteChannelModal}
+                onCloseModal={onCloseModal}
+                setShowInviteChannelModal={setShowInviteChannelModal}
+            />
         </div>
     )
 }

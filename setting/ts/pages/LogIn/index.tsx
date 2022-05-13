@@ -100,7 +100,7 @@ const LogIn = () => {
   if (data) {
     console.log('로그인됨', data);
     // <Redirect exact path="/" to="/login" />; 과 같다
-    return <Redirect to="/workspace/channel" />;
+    return <Redirect to="/workspace/sleact/channel/일반" />;
   }
 
   return (
