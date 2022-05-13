@@ -1,10 +1,10 @@
-import React, {FC, useCallback, useState} from "react"
+import React, {FC, useCallback, useState, VFC} from "react"
 import useSWR from "swr"
 import fetcher from '@utils/fetcher';
 import axios from "axios";
 import { Redirect } from "react-router";
 // import { Redirect as abc } from "react-router"; // 이렇게 하면 Redirect를 abc로 개명해서 사용할 수 있다.
-import { Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceButton, WorkspaceName, WorkspaceWrapper, AddButton } from '@layouts/Workspace/styles';
+import { Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceButton, WorkspaceName, WorkspaceWrapper, AddButton, WorkspaceModal } from '@layouts/Workspace/styles';
 import gravatar from "gravatar"
 import loadable from "@loadable/component";
 import Menu from "@components/Menu";
@@ -20,7 +20,7 @@ import { toast } from "react-toastify"
 
 // children을 쓰는 컴포넌트는 FC타입,  안쓰는 컴포넌트는 VFC가 타입
 // FC라는 타입안에 children이 알아서 들어있다,
-const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
+const Workspace: VFC = () => {
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] = useState(false);
     const [showInviteWorkspaceModal, setShowInviteWorkspaceModal] = useState(false);
@@ -112,6 +112,17 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
         setShowInviteChannelModal(false);
       }, []);
     
+    const toggleWorkspaceModal = () => {
+        setShowWorkspaceModal((prev) => !prev)   
+    }
+
+    const onClickAddChannel = useCallback(() => {
+        setShowCreateChannelModal(true);
+      }, []);
+    
+      const onClickInviteWorkspace = useCallback(() => {
+        setShowInviteWorkspaceModal(true);
+      }, []);
 
     if (!userData) {
         return <Redirect to="/login" />
@@ -163,9 +174,15 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
                     <AddButton onClick={onClickCreateWorkSpace}>+</AddButton>
                 </Workspace> 
                 <Channels>
-                    <WorkspaceName>Sleact</WorkspaceName>
+                    <WorkspaceName onClick={toggleWorkspaceModal}>
+                        {}
+                    </WorkspaceName>
                     <MenuScroll>
-                        MenuScroll
+                        <Menu show={showWorkspaceModal} onCloseModal={toggleWorkspaceModal} style={{ top: 95, left: 80}}>
+                            <WorkspaceModal>
+
+                            </WorkspaceModal>
+                        </Menu>
                     </MenuScroll>
                 </Channels>
                 <Chats>
