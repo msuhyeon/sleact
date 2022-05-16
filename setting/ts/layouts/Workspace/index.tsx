@@ -19,6 +19,9 @@ import useInput from "@hooks/useInput";
 import { toast } from "react-toastify"
 import InviteWorkspaceModal from "@components/InviteWorkspaceModal";
 import CreateChannelModal from "@components/CreateChannelModal";
+import InviteChannelModal from "@components/InviteChannelModal";
+import DMList from "@components/DMList";
+import ChannelList from "@components/ChannelList";
 
 // children을 쓰는 컴포넌트는 FC타입,  안쓰는 컴포넌트는 VFC가 타입
 // FC라는 타입안에 children이 알아서 들어있다,
@@ -191,6 +194,8 @@ const Workspace: VFC = () => {
 
                             </WorkspaceModal>
                         </Menu>
+                        <ChannelList />
+                        <DMList />
                     </MenuScroll>
                 </Channels>
                 <Chats>

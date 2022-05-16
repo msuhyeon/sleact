@@ -76,6 +76,7 @@ const config: webpack.Configuration = {
     filename: '[name].js', // 그 안에 웹페이지 결과물이 생김. [name] 이렇게 써놓은것은 entry.app이다. 
     publicPath: '/dist/',
   },
+  // devServer 이기 때문에 배포할 땐 이 설정이 적용이 안됨!!
   devServer: { // setting한 이유 1. hot reloading 2. proxy server
     historyApiFallback: true, // react router 할 때 필요한 설정. false로 했을 경우 새로고침할 때 /login 이 안뜬다. 이것의 역할: 주소를 사기쳐주는(?).SPA는 페이지가 하나이기 때문에 index.html 하나밖에 없는데 가짜로 /login을 만들어 주는것이다. 얘가 가짜 주소를 입력해준다. 원래는 새로고침할 때 localhost:3090/login은 서버로 간다. /signup을 쳐도 서버는 무조건 localhost:3090으로 간다(index 페이지로 간다는 뜻) true로 해두면 서버에는 없는 주소(/signup, /login)를 있는것 마냥 해줘서 /login, /signup으로 가는 것 이다.  
     port: 3090,

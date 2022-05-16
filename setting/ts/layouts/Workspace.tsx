@@ -16,7 +16,7 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({children}) => {
     // 주소에 쿼리 스트링이나 '/api/users#123' 이렇게 주소를 변형한다. 서버는 #을 무시하기 때문에 둘다 같은 주소로 보내는 요청으로 인식함 
 
     const onLogout = useCallback(() => {
-        axios.post("http://localhost:3095/api/users/logout", null, {
+        axios.post("/api/users/logout", null, {
             withCredentials: true,
         }).then(() => {
             // 서버에 요청 보내는 대신에 클라이언트에서 데이터를 조작할 수 있는 mutate라는 기능이 있음
