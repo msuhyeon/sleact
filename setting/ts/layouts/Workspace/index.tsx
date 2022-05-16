@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useState, VFC} from "react"
+import React, {FC, useCallback, useEffect, useState, VFC} from "react"
 import useSWR from "swr"
 import fetcher from '@utils/fetcher';
 import axios from "axios";
@@ -17,6 +17,8 @@ import { Modal } from '@components/Modal';
 import { Button, Input, Label } from '@pages/SignUp/styles';
 import useInput from "@hooks/useInput";
 import { toast } from "react-toastify"
+import InviteWorkspaceModal from "@components/InviteWorkspaceModal";
+import CreateChannelModal from "@components/CreateChannelModal";
 
 // children을 쓰는 컴포넌트는 FC타입,  안쓰는 컴포넌트는 VFC가 타입
 // FC라는 타입안에 children이 알아서 들어있다,
