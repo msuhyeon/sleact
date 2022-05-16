@@ -40,8 +40,13 @@ const LogIn = () => {
   // fetcher라는 함수는 앞의 주소를 어떻게 처리할지를 적어주는 것, fetcher가 리턴하는 데이터가 data
   // 이때 data나 error 값이 바뀌면 컴포넌트가 리렌더링된다
   const { data, error, mutate } = useSWR('/api/users', fetcher, {
-    dedupingInterval: 1000000,
+    dedupingInterval: 1000000, // dedupingInterval: 몇초마다 주기적으로 재시도 하는게 아니라, 캐시의 유지기간이다. 
+    // 2초동안 useSWR로 아무리 '/api/users'를 요청해도 서버에는 딱 한번만 요청보내고 나머지는 첫번 째 요청의 성공한거에 대한 데이터를 그대로 가져온다.  
   });
+
+  // Workspace 컴포넌트와 데이터를 공유할 수 있다
+  // const { data } = useSWR('hello') 
+
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
@@ -61,18 +66,29 @@ const LogIn = () => {
             withCredentials: true,
           },
         )
-        .then(() => {
+        .then((res) => {
           // 5. 실행된다
-          mutate(); //mutate 할 때 마다 호출한다.
+          mutate(res.data); //mutate 할 때 마다 호출한다.
+
+          // revalidate()이 요청을 한번 더 보내는 것이 단점이다.
+          // 로그인을 하려고 요청을 보내고, 로그인 한 후에 사용자 데이터를 얻어올려고 또 요청보냄 => 비효율적
+          // SWR을 사용하는게 데이터를 저장해주기 때문에 편하지만, 요청을 많이 보내는걸 막아줘야함.
+          // 이 점을 보완한게 mutate
+
+          // revalidate와 mutate의 차이
+
+          // revalidate: 서버로 요청을 다시 보내서 데이터를 다시 가져오는 것
+          // mutate의: 서버에 요청을 안보내고 데이터를 수정하는 것. 또 호출해서 정보를 가져오지 않고 내가 가진 이 res.data 정보를
+          // const { data, error, mutate } = useSWR('/api/users', fetcher... 의 data에 넣어주는 것 -> 이러면 요청을 안보내도 됨.
 
         })
         .catch((error) => {
+          console.log("error:", error)
           setLogInError(error.response?.data?.code === 401);
         });
     },
     [email, password, mutate],
   );
-
 
   if (typeof data === "undefined") {
     return <div>로딩중...</div>
@@ -84,7 +100,7 @@ const LogIn = () => {
   if (data) {
     console.log('로그인됨', data);
     // <Redirect exact path="/" to="/login" />; 과 같다
-    return <Redirect to="/workspace/channel" />;
+    return <Redirect to="/workspace/sleact/channel/일반" />;
   }
 
   return (
