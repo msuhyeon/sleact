@@ -29,7 +29,8 @@ const App = () => {
         <Redirect exact path="/" to="/login" />
         <Route path="/login" component={LogIn}/>
         <Route path="/signup" component={SignUp}/>
-        <Route path="/workspace" component={Workspace}/>
+        {/* 콜론 뒷 부분은 파라미터로 모든 값을 받을 수 있으므로 반드시 젤 아래에 선언해야함. /workspace/users 보다 더 아래에 */}
+        <Route path="/workspace/:workspace" component={Workspace}/>
       </Switch>
   ); 
     
