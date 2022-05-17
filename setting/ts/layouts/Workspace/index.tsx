@@ -56,6 +56,7 @@ const Workspace: VFC = () => {
         // sendBuffer에다가 데이터를 쭉 모아놨다가 다시 연결이 되면 그 동안에 있었던 emit 했던 것 들을 보냄.
         // 중간에 데이터가 날라갈 거 걱정 안해도됨!! 
         // _callbacks{} 에는 on 했던 list들이 들어가있음
+        // socket.io에는 연결에 대한 옵션들이 있음
         console.log(socket);
 
         socket.emit('login', { id: userData.id, channels: channelData.map((v) => v.id) });
