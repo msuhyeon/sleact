@@ -15,14 +15,18 @@ interface Props {
   placeholder?: string;
 }
 const ChatBox: VFC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholder }) => {
+  // 이 컴포넌트는 재사용 되고 있기 때문에 구체적인 작업을 하면 안됨 -> 부모로 데이터 submit
+  // 재사용 되는데 같은 데이터는 훅으로 가져오고, 다른 데이터는 props로 빼줌
   const { workspace } = useParams<{ workspace: string }>();
   const { data: userData, error, revalidate, mutate } = useSWR<IUser | false>('/api/users', fetcher, {
     dedupingInterval: 2000, // 2초
   });
   const { data: memberData } = useSWR<IUser[]>(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
 
+  // 태그에 직접 접근하고 싶을 때 사용
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
+    // ref가 존재 할 경우
     if (textareaRef.current) {
       autosize(textareaRef.current);
     }
@@ -31,13 +35,14 @@ const ChatBox: VFC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholder }) 
   const onKeydownChat = useCallback(
     (e) => {
       if (e.key === 'Enter') {
+        // shift 눌렀는지 확인
         if (!e.shiftKey) {
           e.preventDefault();
           onSubmitForm(e);
         }
-      }
+      } 
     },
-    [onSubmitForm],
+    [onSubmitForm], // props로 받은것은 웬만하면 [deps]에 넣어줌
   );
 
   const renderSuggestion = useCallback(
@@ -65,6 +70,7 @@ const ChatBox: VFC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholder }) 
   return (
     <ChatArea>
       <Form onSubmit={onSubmitForm}>
+        {/* input태그에서 value와 onChange는 항상 같은 태그 안에 */}
         <MentionsTextarea
           id="editor-chat"
           value={chat}
