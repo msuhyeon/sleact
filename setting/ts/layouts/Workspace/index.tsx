@@ -22,6 +22,7 @@ import CreateChannelModal from "@components/CreateChannelModal";
 import InviteChannelModal from "@components/InviteChannelModal";
 import DMList from "@components/DMList";
 import ChannelList from "@components/ChannelList";
+import useSocket from "@hooks/useSocket";
 
 // children을 쓰는 컴포넌트는 FC타입,  안쓰는 컴포넌트는 VFC가 타입
 // FC라는 타입안에 children이 알아서 들어있다,
@@ -45,6 +46,29 @@ const Workspace: VFC = () => {
     //채널 데이터를 서버로 부터 받아옴
     const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher)
 
+    // hook에서 필요한 데이터만 뽑아옴
+    const [socket, disconnect] = useSocket(workspace);
+
+    useEffect(() => {
+      if (channelData && userData && socket) {
+        // receiveBuffer는 항상 비어있어야한다. 뭔가 차 있으면 연결이 끊겨서 서버로 뭔갈 보내지 못하고 있단 뜻. 
+        // => 서버 쪽 에서도 연결이 끊겨 프론트에서 못받았던것을 receiveBuffer에 담아놨다가 다시 연결이 되면 그때 뿌려줌.
+        // sendBuffer에다가 데이터를 쭉 모아놨다가 다시 연결이 되면 그 동안에 있었던 emit 했던 것 들을 보냄.
+        // 중간에 데이터가 날라갈 거 걱정 안해도됨!! 
+        // _callbacks{} 에는 on 했던 list들이 들어가있음
+        console.log(socket);
+
+        socket.emit('login', { id: userData.id, channels: channelData.map((v) => v.id) });
+      }
+    }, [socket, channelData, userData]); // 외부 변수들은 항상 deps에 넣어줘야함
+
+    // workspace가 바뀌었으면 기존의 workspace를 제거
+    useEffect(() => {
+      return () => {
+        disconnect();
+      };
+    }, [workspace, disconnect]);
+    
     // SWR을 이용해서 로컬스토리지의 데이터를 가져 올 수도 있음. 항상 비동기 요청이랑만 관련있는게 아님. 전역 데이터 관리자! -> 리덕스를 대체!!
     // const { data } = useSWR('hello', () => {localStorage.setItem('data', key); return localStorage.getItem('data) })
 
@@ -135,7 +159,7 @@ const Workspace: VFC = () => {
         setShowInviteWorkspaceModal(true);
     }, []);
 
-    if (!userData) {
+    if (!userData) { b 
         return <Redirect to="/login" />
     }
 
@@ -194,7 +218,7 @@ const Workspace: VFC = () => {
 
                             </WorkspaceModal>
                         </Menu>
-                        <ChannelList />
+                        <ChannelList />  
                         <DMList />
                     </MenuScroll>
                 </Channels>
