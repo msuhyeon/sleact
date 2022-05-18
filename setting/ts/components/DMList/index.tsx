@@ -15,7 +15,12 @@ const DMList: FC = () => {
   // props를 되도록 안쓰는게 좋다 부모의 변화 때문에 자식까지 리렌더링 되는걸 방지 하기 위함
   // 사실 성능 면에선 비슷하지만 화면의 깜빡임이 줄어드니까 최적화할때 좀 더 편리 useSelector를 useSWR이 어느정도 대체
   const { workspace } = useParams<{ workspace?: string }>();
-  const { data: userData, error, revalidate, mutate } = useSWR<IUser>('/api/users', fetcher, {
+  const {
+    data: userData,
+    error,
+    revalidate,
+    mutate,
+  } = useSWR<IUser>('/api/users', fetcher, {
     dedupingInterval: 2000, // 2초
   });
   const { data: memberData } = useSWR<IUserWithOnline[]>(
@@ -37,11 +42,14 @@ const DMList: FC = () => {
   }, [workspace]);
 
   useEffect(() => {
+    // 서버로 부터 누가 온라인인지 받아옴
     socket?.on('onlineList', (data: number[]) => {
       setOnlineList(data);
     });
     // socket?.on('dm', onMessage);
     // console.log('socket on dm', socket?.hasListeners('dm'), socket);
+
+    // 정리 하는 곳!
     return () => {
       // socket?.off('dm', onMessage);
       // console.log('socket off dm', socket?.hasListeners('dm'));

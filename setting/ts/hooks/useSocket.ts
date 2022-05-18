@@ -9,8 +9,7 @@ const sockets: { [key: string]: SocketIOClient.Socket } = {};
 // socket.io에는 계층이 있다.
 // namespace와 room
 // workspace를 namespace, channel을 room
-
-const useSocket = (workspace?: string): [SocketIOClient.Socket | undefined, () => void] => {
+const useSocket = (workspace?: string): [SocketIOClient.Socket | undefined, () => void] => { // 타입을 인식 못할 땐 정확히 리턴 값의 타입 까지 적어줘야함
   console.log('rerender', workspace);
   const disconnect = useCallback(() => {
     if (workspace) {
