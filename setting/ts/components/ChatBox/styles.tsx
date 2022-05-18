@@ -16,12 +16,13 @@ export const Form = styled.form`
   border: 1px solid rgb(29, 28, 29);
 `;
 
+// 기존에 존재하는 MentionsInput 태그에다가 스타일을 추가 하겠다.
 export const MentionsTextarea = styled(MentionsInput)`
   font-family: Slack-Lato, appleLogo, sans-serif;
   font-size: 15px;
   padding: 8px 9px;
   width: 100%;
-  & strong {
+  & strong { // nested selector
     background: skyblue;
   }
   & textarea {
