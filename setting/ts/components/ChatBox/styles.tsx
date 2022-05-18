@@ -61,6 +61,15 @@ export const SendButton = styled.button`
   top: 5px;
 `;
 
+// function a() 함수를 호출 하는 방법은
+// a();
+// a.call();
+// a.apply();
+// a.bind();
+// a``; (tagged template literal 방식)
+// a`${() => `${() => `...`}`}` 형태가 지금 사용 중인 것
+
+// styled객체 안에 들어있는 button 이라는 함수 호출문
 export const EachMention = styled.button<{ focus: boolean }>`
   padding: 4px 20px;
   background: transparent;
@@ -79,3 +88,5 @@ export const EachMention = styled.button<{ focus: boolean }>`
     color: white;
   `};
 `;
+// emotion은 이렇게 변수를 쓸 수 있다.
+// focus 값이 true면 추가적으로 css를 렌더링

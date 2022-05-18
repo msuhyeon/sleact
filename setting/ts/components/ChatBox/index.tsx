@@ -18,7 +18,12 @@ const ChatBox: VFC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholder }) 
   // 이 컴포넌트는 재사용 되고 있기 때문에 구체적인 작업을 하면 안됨 -> 부모로 데이터 submit
   // 재사용 되는데 같은 데이터는 훅으로 가져오고, 다른 데이터는 props로 빼줌
   const { workspace } = useParams<{ workspace: string }>();
-  const { data: userData, error, revalidate, mutate } = useSWR<IUser | false>('/api/users', fetcher, {
+  const {
+    data: userData,
+    error,
+    revalidate,
+    mutate,
+  } = useSWR<IUser | false>('/api/users', fetcher, {
     dedupingInterval: 2000, // 2초
   });
   const { data: memberData } = useSWR<IUser[]>(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
@@ -45,6 +50,7 @@ const ChatBox: VFC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholder }) 
     [onSubmitForm], // props로 받은것은 웬만하면 [deps]에 넣어줌
   );
 
+  // <Mention />의 renderSuggestion 타입을 그대로 긁어옴
   const renderSuggestion = useCallback(
     (
       suggestion: SuggestionDataItem,
@@ -55,6 +61,7 @@ const ChatBox: VFC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholder }) 
     ): React.ReactNode => {
       if (!memberData) return;
       return (
+        // 버튼 태그
         <EachMention focus={focus}>
           <img
             src={gravatar.url(memberData[index].email, { s: '20px', d: 'retro' })}
@@ -70,7 +77,9 @@ const ChatBox: VFC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholder }) 
   return (
     <ChatArea>
       <Form onSubmit={onSubmitForm}>
-        {/* input태그에서 value와 onChange는 항상 같은 태그 안에 */}
+        {/* input태그에서 value와 onChange는 항상 같은 태그 안에
+            MentionsTextarea는 MentionsInput에 css가 추가된 버전이라고 보면됨
+        */}
         <MentionsTextarea
           id="editor-chat"
           value={chat}
@@ -80,6 +89,10 @@ const ChatBox: VFC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholder }) 
           inputRef={textareaRef}
           allowSuggestionsAboveCursor
         >
+          {/* trigger 옵션: 태깅 활성화
+              appendSpaceOnAdd 옵션: 태깅 할 사람 선택 후 커서 한칸 띄우기?
+              Mention의 부모는 무조건 MentionsInput 이어야함(규칙)
+           */}
           <Mention
             appendSpaceOnAdd
             trigger="@"
