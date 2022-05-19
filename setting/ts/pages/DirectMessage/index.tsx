@@ -18,13 +18,31 @@ const DirectMessage = () => {
   const { data: userData } = useSWR(`/api/workspaces/${workspace}/users/${id}`, fetcher);
   const { data: myData } = useSWR('/api/users', fetcher);
   const [chat, onChangeChat, setChat] = useInput('');
-  const { data: chatData, mutate: mutateChat, revalidate, setSize } = useSWRInfinite<IDM[]>(
+
+  // useSWRInfinite: inifinite scrolling 전용 메서드, index는 페이지, setSize는 페이지 수를 바꿔주는 것
+  const {
+    data: chatData,
+    mutate: mutateChat,
+    revalidate,
+    setSize,
+  } = useSWRInfinite<IDM[]>(
     (index) => `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=${index + 1}`,
     fetcher,
   );
+
+  // useSWRInfinite를 사용하면 2차원 배열로 받아옴
+  // 처음엔 이렇게 불러오다가 [[{id: 3}, {id: 4}]]
+  // 그 다음 페이지에선 이렇게 불러옴 [[{id: 1}, {id: 2}], [{id: 3}, {id: 4}]]
+  // 최신 데이터가 앞에 붙음!
+
   const [socket] = useSocket(workspace);
+
+  // infinite scrolling 할 땐 이 두개의 변수를 선언해 주는게 좋음
   const isEmpty = chatData?.[0]?.length === 0;
+
+  // empty는 아니지만 데이터를 20개 보다 적게 가져왔다 == 다 가져왔다
   const isReachingEnd = isEmpty || (chatData && chatData[chatData.length - 1]?.length < 20) || false;
+  // 채팅을 하다가 잠깐 스크롤 올렸다가 채팅하다가 엔터 눌렀을 경우 스크롤이 내려와서 내가 지금 친 채팅이 보여야함
   const scrollbarRef = useRef<Scrollbars>(null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -140,10 +158,10 @@ const DirectMessage = () => {
     return null;
   }
 
-  // [].concat(...chatData).reverse(): chatData가 거꾸로 보여지는 현상 때문에 immutable 하게 리버스 시켜줌
-  // 빈 배열에다가 chatData를 넣으면 새 배열이 생기고, 그걸 리버스 하는 방법(concat이 immutable함)
+  // [].concat(...chatData).reverse(): chatData가 거꾸로 보여지는 현상 때문에 immutable 하게 리버싱 시켜줌
+  // 빈 배열에다가 chatData를 넣으면 새 배열이 생기고, 그걸 리버싱  하는 방법(concat이 immutable함)
   // [...chatData].reverse() 도 가능함!! spread를 쓰면 새로운 배열이됨
-  // chatData.flat().reverse()
+  // flat(): 2차원 배열을 1차원 배열로 만들어주는 함수
   const chatSections = makeSection(chatData ? chatData.flat().reverse() : []);
 
   return (
