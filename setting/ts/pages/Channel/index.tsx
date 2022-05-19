@@ -14,6 +14,8 @@ import { useParams } from 'react-router';
 import useSWR, { useSWRInfinite } from 'swr';
 
 const Channel = () => {
+  // 기존 코드를 기반으로 코드를 수정 할 때에는 가장 의존이 많이 되는 부분을 바꿔주는 것이 좋다.
+
   const { workspace, channel } = useParams<{ workspace: string; channel: string }>();
   const { data: myData } = useSWR('/api/users', fetcher);
   const [chat, onChangeChat, setChat] = useInput('');

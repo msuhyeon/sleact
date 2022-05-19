@@ -23,9 +23,6 @@ import gravatar from 'gravatar';
 import loadable from '@loadable/component';
 import Menu from '@components/Menu';
 import { Link, Route, Switch } from 'react-router-dom';
-
-const Channel = loadable(() => import('@pages/Channel'));
-const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 import { IUser, IChannel } from '@typings/db';
 import { Modal } from '@components/Modal';
 import { Button, Input, Label } from '@pages/SignUp/styles';
@@ -37,6 +34,9 @@ import InviteChannelModal from '@components/InviteChannelModal';
 import DMList from '@components/DMList';
 import ChannelList from '@components/ChannelList';
 import useSocket from '@hooks/useSocket';
+
+const Channel = loadable(() => import('@pages/Channel'));
+const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 
 // children을 쓰는 컴포넌트는 FC타입,  안쓰는 컴포넌트는 VFC가 타입
 // FC라는 타입안에 children이 알아서 들어있다,
@@ -199,7 +199,7 @@ const Workspace: VFC = () => {
         <RightMenu>
           <span>
             <span onClick={onClickUserProfile}>
-              <ProfileImg src={gravatar.url(userData.nickname, { s: '28px', d: 'retro' })} alt={userData.nickname} />
+              <ProfileImg src={gravatar.url(userData.email, { s: '28px', d: 'retro' })} alt={userData.nickname} />
               {/* 단일 책임 원칙: 하나의 컴포넌트는 하나의 역할만 한다. => 이 규칙에 따라 컴포넌트를 분리하기도함. */}
               {showUserMenu && (
                 <Menu style={{ right: 0, top: 38 }} show={showUserMenu} onCloseModal={onClickUserProfile}>
