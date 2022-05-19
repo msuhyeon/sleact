@@ -140,6 +140,10 @@ const DirectMessage = () => {
     return null;
   }
 
+  // [].concat(...chatData).reverse(): chatData가 거꾸로 보여지는 현상 때문에 immutable 하게 리버스 시켜줌
+  // 빈 배열에다가 chatData를 넣으면 새 배열이 생기고, 그걸 리버스 하는 방법(concat이 immutable함)
+  // [...chatData].reverse() 도 가능함!! spread를 쓰면 새로운 배열이됨
+  // chatData.flat().reverse()
   const chatSections = makeSection(chatData ? chatData.flat().reverse() : []);
 
   return (

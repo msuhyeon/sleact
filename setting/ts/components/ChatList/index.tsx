@@ -28,7 +28,8 @@ const ChatList = forwardRef<Scrollbars, Props>(({ chatSections, setSize, isReach
 
   return (
     <ChatZone>
-      <Scrollbars autoHide ref={scrollRef} onScrollFrame={onScroll}>
+      <Scrollbars ref={scrollRef} onScrollFrame={onScroll}>
+        {/* Object.entries(): 객체를 배열로 바꿈 */}
         {Object.entries(chatSections).map(([date, chats]) => {
           return (
             <Section className={`section-${date}`} key={date}>

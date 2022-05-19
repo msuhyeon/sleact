@@ -16,6 +16,7 @@ const useInput = <T = any>(initialData: T): ReturnTypes<T> => {
        setValue(e.target.value)
    }, [])
 
+   // () => void : 리턴 값이 없다. undefined 처럼 사용된다. 
    // [T, (e: any) => void, Dispatch<SetStateAction<T>>] 는 리턴값의 타입을 선언한 것 
    // e를 any 대신 ChangeEvent<HTMLInputElement>, e.target.value 대신 e.target.value as unknown as T로 바꿀 수 있다.
    return [value, handler, setValue]
