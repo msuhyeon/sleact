@@ -9,15 +9,22 @@ interface Props {
   setSize: (f: (size: number) => number) => Promise<(IDM | IChat)[][] | undefined>;
   isReachingEnd: boolean;
 }
+
+// forwardRef: 다른 ref를 만들어서 그 ref를 다른 컴포넌트에 전달할 때 사용[forwardRef((props, ref) => (...))]
+// https://ko.reactjs.org/docs/react-api.html#reactforwardref
 const ChatList = forwardRef<Scrollbars, Props>(({ chatSections, setSize, isReachingEnd }, scrollRef) => {
+  // scrollRef:  다른 컴포넌트에서 ref를 집어 넣어주고 싶음
   const onScroll = useCallback(
     (values) => {
       if (values.scrollTop === 0 && !isReachingEnd) {
         console.log('가장 위');
+
+        // 과거 데이터 기반으로 데이터 업데이트
         setSize((prevSize) => prevSize + 1).then(() => {
           // 스크롤 위치 유지
-          const current = (scrollRef as MutableRefObject<Scrollbars>)?.current;
+          const current = (scrollRef as MutableRefObject<Scrollbars>)?.cur ㅍ rent;
           if (current) {
+            // 현재 스크롤 높이에서 스크롤바의 높이를 빼면 n번째 메시지에서 위로 스크롤링 했을 때 n-1번째 메시지가 보임
             current.scrollTop(current.getScrollHeight() - values.scrollHeight);
           }
         });
@@ -28,7 +35,8 @@ const ChatList = forwardRef<Scrollbars, Props>(({ chatSections, setSize, isReach
 
   return (
     <ChatZone>
-      <Scrollbars autoHide ref={scrollRef} onScrollFrame={onScroll}>
+      <Scrollbars ref={scrollRef} onScrollFrame={onScroll}>
+        {/* Object.entries(): 객체를 배열로 바꿈 */}
         {Object.entries(chatSections).map(([date, chats]) => {
           return (
             <Section className={`section-${date}`} key={date}>
