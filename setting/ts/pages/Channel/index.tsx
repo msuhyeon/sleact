@@ -26,7 +26,7 @@ const Channel = () => {
     // revalidate,
     setSize,
   } = useSWRInfinite<IChat[]>(
-    (index) => `/api/workspaces/${workspace}/channels/${channel}/chats?perPage=20&page=${index + 1}`,
+    (index: number) => `/api/workspaces/${workspace}/channels/${channel}/chats?perPage=20&page=${index + 1}`,
     fetcher,
   );
   const { data: channelMembersData } = useSWR<IUser[]>(
@@ -47,12 +47,13 @@ const Channel = () => {
   // revalidate() 하면 B가 먼저 보낸 것 처럼 느껴지지만 실제 A의 데이터를 받아오면 메시지 순서가 제대로보임
 
   const onSubmitForm = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       console.log(chat);
       if (chat?.trim() && chatData && channelData) {
         const savedChat = chat;
-        mutateChat((prevChatData) => {
+        mutateChat((prevChatData: any) => {
+          // TODO: type 수정
           // optimistic UI로 데이터를 넣음
           prevChatData?.[0].unshift({
             id: (chatData[0][0]?.id || 0) + 1,
@@ -73,7 +74,7 @@ const Channel = () => {
             content: chat,
           })
           .then(() => {
-            mutate(false, false)
+            mutate(false, false);
             // revalidate();
           })
           .catch(console.error);
@@ -87,7 +88,8 @@ const Channel = () => {
       // id는 상대방 아이디
       // 내가 친 메시지는 socket.io로 오는것이 아니라 optimistic UI로 넣음!!
       if (data.Channel.name === channel && (data.content.startsWith('uploads\\') || data.UserId !== myData?.id)) {
-        mutateChat((chatData) => {
+        mutateChat((chatData: any) => {
+          // TODO: type 수정
           chatData?.[0].unshift(data);
           return chatData;
         }, false).then(() => {
@@ -134,7 +136,7 @@ const Channel = () => {
     setShowInviteChannelModal(false);
   }, []);
 
-  const onChangeFile = useCallback((e) => {
+  const onChangeFile = useCallback((e: any) => {
     const formData = new FormData();
     if (e.target.files) {
       // Use DataTransferItemList interface to access the file(s)
@@ -148,7 +150,7 @@ const Channel = () => {
   }, []);
 
   const onDrop = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       console.log(e);
       const formData = new FormData();
@@ -176,7 +178,7 @@ const Channel = () => {
     [workspace, channel],
   );
 
-  const onDragOver = useCallback((e) => {
+  const onDragOver = useCallback((e: any) => {
     e.preventDefault();
     console.log(e);
     setDragOver(true);

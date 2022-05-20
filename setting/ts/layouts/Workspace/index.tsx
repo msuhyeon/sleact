@@ -120,7 +120,7 @@ const Workspace: VFC = () => {
       });
   }, []);
 
-  const onClickUserProfile = useCallback((e) => {
+  const onClickUserProfile = useCallback((e: any) => {
     e.stopPropagation();
     setShowUserMenu((prev) => !prev);
   }, []);

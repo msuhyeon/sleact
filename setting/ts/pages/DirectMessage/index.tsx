@@ -26,7 +26,7 @@ const DirectMessage = () => {
     revalidate,
     setSize,
   } = useSWRInfinite<IDM[]>(
-    (index) => `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=${index + 1}`,
+    (index: number) => `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=${index + 1}`,
     fetcher,
   );
 
@@ -47,7 +47,7 @@ const DirectMessage = () => {
   const [dragOver, setDragOver] = useState(false);
 
   const onSubmitForm = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       console.log(chat);
       if (chat?.trim() && chatData) {
@@ -57,7 +57,7 @@ const DirectMessage = () => {
         // 사용자 경험이 좋지 않을 수 있음
         // 그래서 서버쪽에 갔다오진 않았지만 마치 성공해서 데이터가 있는 것 마냥 먼저 UI에 데이터를 넣어 놓는다
         // 안정성보단 사용성을 더 중요시한 케이스
-        mutateChat((prevChatData) => {
+        mutateChat((prevChatData: any) => {
           // DM 객체
           prevChatData?.[0].unshift({
             id: (chatData[0][0]?.id || 0) + 1,
@@ -98,7 +98,7 @@ const DirectMessage = () => {
       // 그래서 그냥 mutateChat에서 가장 최신 배열에 가장 최신으로 데이터를 넣는다.
       // 그리고 스크롤바만 조정한다.
 
-      mutateChat((chatData) => {
+      mutateChat((chatData: any) => {
         chatData?.[0].unshift(data);
         return chatData;
       }, false).then(() => {
@@ -141,7 +141,7 @@ const DirectMessage = () => {
   }, [chatData]);
 
   const onDrop = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       console.log(e);
       const formData = new FormData();
@@ -170,7 +170,7 @@ const DirectMessage = () => {
     [revalidate, workspace, id],
   );
 
-  const onDragOver = useCallback((e) => {
+  const onDragOver = useCallback((e: any) => {
     e.preventDefault();
     console.log(e);
     setDragOver(true);
