@@ -51,6 +51,7 @@ const Channel = () => {
       if (chat?.trim() && chatData && channelData) {
         const savedChat = chat;
         mutateChat((prevChatData) => {
+          // optimistic UI로 데이터를 넣음
           prevChatData?.[0].unshift({
             id: (chatData[0][0]?.id || 0) + 1,
             content: savedChat,
@@ -81,6 +82,7 @@ const Channel = () => {
   const onMessage = useCallback(
     (data: IChat) => {
       // id는 상대방 아이디
+      // 내가 친 메시지는 socket.io로 오는것이 아니라 optimistic UI로 넣음!!
       if (data.Channel.name === channel && (data.content.startsWith('uploads\\') || data.UserId !== myData?.id)) {
         mutateChat((chatData) => {
           chatData?.[0].unshift(data);
