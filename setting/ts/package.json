@@ -48,6 +48,7 @@
     "@types/react-mentions": "^4.1.6",
     "@types/socket.io-client": "^3.0.0",
     "@types/webpack": "^5.28.0",
+    "@types/webpack-bundle-analyzer": "^4.4.1",
     "@types/webpack-dev-server": "^3.11.1",
     "babel-loader": "^8.2.4",
     "eslint": "^8.13.0",
@@ -67,7 +68,7 @@
   "scripts": {
     "dev": "cross-env TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack server --env development",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cross-env TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack"
+    "build": "cross-env NODE_ENV=production TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack"
   },
   "author": "msh",
   "license": "ISC"

@@ -22,7 +22,7 @@ const ChatList = forwardRef<Scrollbars, Props>(({ chatSections, setSize, isReach
         // 과거 데이터 기반으로 데이터 업데이트
         setSize((prevSize) => prevSize + 1).then(() => {
           // 스크롤 위치 유지
-          const current = (scrollRef as MutableRefObject<Scrollbars>)?.cur ㅍ rent;
+          const current = (scrollRef as MutableRefObject<Scrollbars>)?.current;
           if (current) {
             // 현재 스크롤 높이에서 스크롤바의 높이를 빼면 n번째 메시지에서 위로 스크롤링 했을 때 n-1번째 메시지가 보임
             current.scrollTop(current.getScrollHeight() - values.scrollHeight);

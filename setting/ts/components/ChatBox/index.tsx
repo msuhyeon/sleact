@@ -21,7 +21,7 @@ const ChatBox: VFC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholder }) 
   const {
     data: userData,
     error,
-    revalidate,
+    // revalidate,
     mutate,
   } = useSWR<IUser | false>('/api/users', fetcher, {
     dedupingInterval: 2000, // 2초
@@ -38,14 +38,14 @@ const ChatBox: VFC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholder }) 
   }, []);
 
   const onKeydownChat = useCallback(
-    (e) => {
+    (e: any) => {
       if (e.key === 'Enter') {
         // shift 눌렀는지 확인
         if (!e.shiftKey) {
           e.preventDefault();
           onSubmitForm(e);
         }
-      } 
+      }
     },
     [onSubmitForm], // props로 받은것은 웬만하면 [deps]에 넣어줌
   );

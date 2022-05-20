@@ -11,7 +11,7 @@ import axios from 'axios';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Scrollbars from 'react-custom-scrollbars';
 import { useParams } from 'react-router';
-import useSWR, { useSWRInfinite } from 'swr';
+import useSWR, { mutate, useSWRInfinite } from 'swr';
 
 const Channel = () => {
   // 기존 코드를 기반으로 코드를 수정 할 때에는 가장 의존이 많이 되는 부분을 바꿔주는 것이 좋다.
@@ -23,7 +23,7 @@ const Channel = () => {
   const {
     data: chatData,
     mutate: mutateChat,
-    revalidate,
+    // revalidate,
     setSize,
   } = useSWRInfinite<IChat[]>(
     (index) => `/api/workspaces/${workspace}/channels/${channel}/chats?perPage=20&page=${index + 1}`,
@@ -40,9 +40,11 @@ const Channel = () => {
   const [showInviteChannelModal, setShowInviteChannelModal] = useState(false);
   const [dragOver, setDragOver] = useState(false);
 
-  // 0초 A: 안녕~(optimistic UI)
-  // 1초 B: 안녕~
-  // 2초 A: 안녕~(실제 서버)
+  // 엄청 느린 인터넷 환경 일 경우
+  // 0초 A: 안녕~(optimistic UI 이라서 서버 안감)
+  // 1초 B: 안녕~(B는 내가 먼저 말했다 라고 생각할 수 있음)
+  // 2초 A: 안녕~(이제 실제 서버에서 받아옴)
+  // revalidate() 하면 B가 먼저 보낸 것 처럼 느껴지지만 실제 A의 데이터를 받아오면 메시지 순서가 제대로보임
 
   const onSubmitForm = useCallback(
     (e) => {
@@ -71,7 +73,8 @@ const Channel = () => {
             content: chat,
           })
           .then(() => {
-            revalidate();
+            mutate(false, false)
+            // revalidate();
           })
           .catch(console.error);
       }

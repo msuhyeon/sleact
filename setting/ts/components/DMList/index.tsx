@@ -18,7 +18,6 @@ const DMList: FC = () => {
   const {
     data: userData,
     error,
-    revalidate,
     mutate,
   } = useSWR<IUser>('/api/users', fetcher, {
     dedupingInterval: 2000, // 2초
@@ -53,8 +52,8 @@ const DMList: FC = () => {
     return () => {
       // socket?.off('dm', onMessage);
       // console.log('socket off dm', socket?.hasListeners('dm'));
-      socket?.off('onlineList'); 
-      // 이벤트 리스너가 있으면 이벤트 정리하는 함수도 있다!! 
+      socket?.off('onlineList');
+      // 이벤트 리스너가 있으면 이벤트 정리하는 함수도 있다!!
       // 만약에 on만 5번 됐을 경우, 한번 서버에서 데이터를 보내줄 때 프론트에서는 5번을 받는다.
       // 이벤트 리스너가 두번 이상 연결 되지 않도록 꼭 정리를 하는 cleanUp함수가 필요함.
     };

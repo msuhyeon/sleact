@@ -1,6 +1,7 @@
 import { IDM, IChat } from '@typings/db';
 import dayjs from 'dayjs';
 
+// makeSection이 디엠만 만들어주는게 아니라 챗도 만들어줘서 둘다 선언해야함
 export default function makeSection(chatList: (IDM | IChat)[]) {
   const sections: { [key: string]: (IDM | IChat)[] } = {};
   chatList.forEach((chat) => {
